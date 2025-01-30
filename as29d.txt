@@ -1,0 +1,224 @@
+# Question 1: N-Queens Problem
+def solveNQueens(n):
+    def solve(row, cols, diags1, diags2, board):
+        if row == n:
+            res.append(["".join(row) for row in board])
+            return
+        for col in range(n):
+            diag1 = row - col
+            diag2 = row + col
+            if col in cols or diag1 in diags1 or diag2 in diags2:
+                continue
+            board[row][col] = 'Q'
+            solve(row + 1, cols | {col}, diags1 | {diag1}, diags2 | {diag2}, board)
+            board[row][col] = '.'
+    
+    res = []
+    board = [['.' for _ in range(n)] for _ in range(n)]
+    solve(0, set(), set(), set(), board)
+    return res
+
+# Input
+N = 4
+# Output
+print(solveNQueens(N))
+
+# Question 2: Word Search
+def exist(board, word):
+    def dfs(i, j, word):
+        if len(word) == 0:
+            return True
+        if i < 0 or i >= len(board) or j < 0 or j >= len(board[0]) or board[i][j] != word[0]:
+            return False
+        tmp = board[i][j]
+        board[i][j] = '#'
+        res = dfs(i+1, j, word[1:]) or dfs(i-1, j, word[1:]) or dfs(i, j+1, word[1:]) or dfs(i, j-1, word[1:])
+        board[i][j] = tmp
+        return res
+    
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if dfs(i, j, word):
+                return True
+    return False
+
+# Input
+board1 = [['A','B','C','E'], ['S','F','C','S'], ['A','D','E','E']]
+word1 = "ABCCED"
+board2 = [['A','B','C','E'], ['S','F','C','S'], ['A','D','E','E']]
+word2 = "SEE"
+
+# Output
+print(exist(board1, word1))  # True
+print(exist(board2, word2))  # True
+
+# Question 3: Unique Paths
+def uniquePaths(m, n):
+    dp = [[1] * n for _ in range(m)]
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[i][j] = dp[i-1][j] + dp[i][j-1]
+    return dp[-1][-1]
+
+# Input
+m1, n1 = 3, 2
+m2, n2 = 7, 3
+
+# Output
+print(uniquePaths(m1, n1))  # 3
+print(uniquePaths(m2, n2))  # 28
+
+# Question 4: Generate All Parentheses
+def generateParenthesis(n):
+    def backtrack(s='', left=0, right=0):
+        if len(s) == 2 * n:
+            res.append(s)
+            return
+        if left < n:
+            backtrack(s + '(', left + 1, right)
+        if right < left:
+            backtrack(s + ')', left, right + 1)
+    
+    res = []
+    backtrack()
+    return res
+
+# Input
+n1 = 3
+n2 = 2
+
+# Output
+print(generateParenthesis(n1))  # ["((()))", "(()())", "(())()", "()(())", "()()()"]
+print(generateParenthesis(n2))  # ["(())", "()()"]
+
+# Question 5: Partition a String into Palindromes
+def partition(s):
+    def isPalindrome(s):
+        return s == s[::-1]
+
+    def backtrack(start, path):
+        if start == len(s):
+            res.append(path)
+            return
+        for end in range(start + 1, len(s) + 1):
+            if isPalindrome(s[start:end]):
+                backtrack(end, path + [s[start:end]])
+
+    res = []
+    backtrack(0, [])
+    return res
+
+# Input
+s1 = "aab"
+s2 = "abc"
+
+# Output
+print(partition(s1))  # [["a", "a", "b"], ["aa", "b"]]
+print(partition(s2))  # [["a", "b", "c"]]
+
+# Question 6: Find Anagrams in a List
+from collections import defaultdict
+
+def groupAnagrams(words):
+    anagrams = defaultdict(list)
+    for word in words:
+        sorted_word = ''.join(sorted(word))
+        anagrams[sorted_word].append(word)
+    return list(anagrams.values())
+
+# Input
+words = ["listen", "silent", "enlist", "rat", "tar", "art", "cat", "act"]
+
+# Output
+print(groupAnagrams(words))  # [["listen", "silent", "enlist"], ["rat", "tar", "art"], ["cat", "act"]]
+
+# Question 7: Top K Frequent Elements
+from collections import Counter
+import heapq
+
+def topKFrequent(nums, k):
+    count = Counter(nums)
+    return heapq.nlargest(k, count.keys(), key=count.get)
+
+# Input
+nums = [1, 1, 1, 2, 2, 3]
+k = 2
+
+# Output
+print(topKFrequent(nums, k))  # [1, 2]
+
+# Question 8: Longest Substring with Unique Characters
+def lengthOfLongestSubstring(s):
+    char_map = {}
+    left = 0
+    max_length = 0
+    
+    for right in range(len(s)):
+        if s[right] in char_map:
+            left = max(left, char_map[s[right]] + 1)
+        char_map[s[right]] = right
+        max_length = max(max_length, right - left + 1)
+    
+    return max_length
+
+# Input
+s1 = "abcabcbb"
+s2 = "bbbbb"
+
+# Output
+print(lengthOfLongestSubstring(s1))  # 3
+print(lengthOfLongestSubstring(s2))  # 1
+
+# Question 9: Word Pattern
+def wordPattern(pattern, str):
+    words = str.split()
+    if len(pattern) != len(words):
+        return False
+    
+    char_to_word = {}
+    word_to_char = {}
+    
+    for c, w in zip(pattern, words):
+        if c in char_to_word and char_to_word[c] != w:
+            return False
+        if w in word_to_char and word_to_char[w] != c:
+            return False
+        char_to_word[c] = w
+        word_to_char[w] = c
+    
+    return True
+
+# Input
+pattern1 = "abba"
+words1 = "dog cat cat dog"
+pattern2 = "abba"
+words2 = "dog cat cat fish"
+
+# Output
+print(wordPattern(pattern1, words1))  # True
+print(wordPattern(pattern2, words2))  # False
+
+# Question 10: Find Itinerary from Tickets
+from collections import defaultdict
+import heapq
+
+def findItinerary(tickets):
+    flights = defaultdict(list)
+    for start, end in tickets:
+        heapq.heappush(flights[start], end)
+    
+    path = []
+    
+    def visit(airport):
+        while flights[airport]:
+            visit(heapq.heappop(flights[airport]))
+        path.append(airport)
+    
+    visit('JFK')
+    return path[::-1]
+
+# Input
+tickets = [["JFK", "SFO"], ["JFK", "ATL"], ["SFO", "ATL"], ["ATL", "JFK"], ["ATL", "SFO"]]
+
+# Output
+print(findItinerary(tickets))  # ["JFK", "ATL", "JFK", "SFO", "ATL", "SFO"]
